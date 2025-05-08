@@ -1,0 +1,57 @@
+# Byte-compiled / optimized / DLL files
+
+**pycache**/
+\*.py\[cod]
+\*\$py.class
+
+# Environment and virtualenv
+
+.env
+.venv/
+venv/
+ENV/
+env/
+\*.env
+
+# Installer log
+
+pip-log.txt
+
+# Flask session files and SQLite
+
+instance/
+\*.db
+\*.sqlite3
+
+# OS generated files
+
+.DS\_Store
+Thumbs.db
+
+# Editor & IDE settings
+
+.vscode/
+.idea/
+
+# Log files
+
+\*.log
+
+# Backup and swap files
+
+\*\~
+\*.bak
+\*.swp
+\*.swo
+
+# Build artifacts
+
+dist/
+build/
+\*.egg-info/
+
+# Logo and thumbnail images (optional, if generated)
+
+logo.png
+logo\_full.png
+placeholder.png
