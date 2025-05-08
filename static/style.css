@@ -65,7 +65,7 @@ body {
   font-size: 1.1rem;
   font-style: italic;
   display: inline-block;
-  max-width: 300px;
+  max-width: 600px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
