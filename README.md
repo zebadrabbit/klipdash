@@ -1,5 +1,4 @@
-
-# KlipDash
+<img src="https://github.com/user-attachments/assets/af8caf3b-b8fb-428d-98ff-e4fc79660847" width="208" height="100"/>
 
 **KlipDash** is a lightweight, real-time dashboard for monitoring multiple 3D printers running [Klipper](https://www.klipper3d.org/) via [Moonraker](https://moonraker.readthedocs.io/). Built by [FireTail Fabrication](https://firetailfab.com), KlipDash helps you stay on top of multiple machines from one simple interface.
 
