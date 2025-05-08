@@ -43,4 +43,15 @@ def send_command(ip):
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    print(r"""
+ __     __ __           __               __    
+|  |--.|  |__|.-----.--|  |.---.-.-----.|  |--.
+|    < |  |  ||  _  |  _  ||  _  |__ --||     |
+|__|__||__|__||   __|_____||___._|_____||__|__|
+              |__|                                     
+        ⚙️ Real-time Klipper Printer Dashboard
+        🐾 Created by FireTail Fabrication · 2025
+        💻 github.com/zebadrabbit/klipdash
+    """)
+    
+    app.run(debug=True,host='0.0.0.0', port=5000)

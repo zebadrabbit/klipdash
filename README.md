@@ -32,7 +32,8 @@
 ```bash
 git clone https://github.com/zebadrabbit/klipdash.git
 cd klipdash
-pip install flask
+chmod +x install.sh
+./install.sh
 ```
 
 ---
