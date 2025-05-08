@@ -61,9 +61,7 @@ Each printer should:
 
 ## 📸 Screenshots
 
-| Desktop View | Mobile View |
-|--------------|-------------|
-| ![](docs/screenshot-desktop.png) | ![](docs/screenshot-mobile.png) |
+![image](https://github.com/user-attachments/assets/b04a0e5b-09b9-4808-b1d0-1788b7452ea9)
 
 ---
 
