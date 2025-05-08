@@ -73,6 +73,26 @@ Each printer should:
 
 ---
 
+## 📥 Installation Script
+
+For convenience, you can use the provided `install.sh` script to set up KlipDash and its dependencies automatically.
+
+### Usage
+
+```bash
+chmod +x install.sh
+./install.sh
+```
+
+The script will:
+- Install Python dependencies
+- Set up Flask
+- Systemd service installation
+
+Make sure to review the script before running it to ensure it meets your requirements.
+
+---
+
 ## 🐾 About FireTail Fabrication
 
 **FireTail Fabrication** is a one-woman 3D printing business based in Arkansas, specializing in pet safety products like the **Pet Defender** — a 3D-printed wheel cover designed to protect pets from rolling office chairs.
@@ -93,3 +113,5 @@ This project is licensed under the **MIT License** — fork it, improve it, and 
 - 🐾 [FireTail Fabrication](https://firetailfab.com)
 - 💻 [KlipDash GitHub Repo](https://github.com/zebadrabbit/klipdash)
 - 🐦 [Bluesky](https://bsky.app/profile/firetailfab.bsky.social)
+
+
