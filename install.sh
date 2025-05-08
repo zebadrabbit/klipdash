@@ -10,7 +10,16 @@ WORKDIR=$(pwd)
 SERVICE_NAME="klipdash.service"
 SERVICE_PATH="/etc/systemd/system/$SERVICE_NAME"
 
-echo "Creating systemd service for KlipDash..."
+echo "📦 Installing Python dependencies..."
+# Install Python dependencies
+if [ -f "requirements.txt" ]; then
+    pip3 install -r requirements.txt
+else
+    echo "❌ requirements.txt not found. Installing Flask as a default dependency."
+    pip3 install flask
+fi
+
+echo "🛠️ Creating systemd service for KlipDash..."
 
 # Create the service file content
 cat <<EOF | sudo tee $SERVICE_PATH > /dev/null
@@ -27,6 +36,8 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 EOF
+
+echo "🔧 Configuring systemd service..."
 
 # Set permissions and enable the service
 sudo systemctl daemon-reload
