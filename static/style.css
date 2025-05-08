@@ -1,0 +1,93 @@
+body {
+    background-color: #151F24;
+  }
+  
+  .header img {
+    width: 208px;
+    height: 100px;
+  }
+  
+  .card.printer-panel {
+    background-color: #2E4B52;
+  }  
+  
+  .progress {
+    height: 45px;
+  }
+  
+  .progress-bar {
+    font-weight: bold;
+    font-size: 1.25rem;
+  }
+  
+  .thumbnail {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    background-color: #2c2c2c;
+  }
+  
+  .text-light {
+    color: #C1CACB !important;
+  }
+  
+  .mb-1 {
+    margin-bottom: 0.25rem !important;
+  }
+  .card.printer-panel {
+    background-color: #2E4B52;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+
+  }
+    
+/* Dynamic colors */
+.status-printing {
+  background-color: #28a745; /* green */
+}
+
+.status-paused {
+  background-color: #ffc107; /* yellow */
+}
+
+.status-complete {
+  background-color: #007bff; /* blue */
+}
+
+.status-offline {
+  background-color: #6c757d; /* gray */
+}
+
+.filename-label {
+  font-size: 1.1rem;
+}
+
+.filename-value {
+  font-size: 1.1rem;
+  font-style: italic;
+  display: inline-block;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.logo {
+  width: 208px;
+  height: 100px;
+}
+
+.menu-links {
+  font-size: 0.95rem;
+  padding-bottom: 0.25rem;
+}
+
+.menu-link {
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.menu-link:hover {
+  color: #ffffff;
+  text-decoration: none;
+}

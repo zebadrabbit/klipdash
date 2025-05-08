@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>KlipDash</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body class="container py-4">
+  <div class="header mb-4">
+    <div class="d-flex justify-content-between align-items-end mb-4" id="header-bar">
+      <img src="{{ url_for('static', filename='logo_full.png') }}" alt="KlipDash Logo" class="logo">
+      <div class="text-end">
+        <nav class="menu-links">
+          <a href="#" class="menu-link text-light me-3" onclick="updateAll()">
+            <i class="bi bi-arrow-clockwise"></i> Refresh
+          </a>
+          <a href="#" class="menu-link text-light me-3" data-bs-toggle="modal" data-bs-target="#aboutModal">
+            <i class="bi bi-info-circle"></i> About
+          </a>
+          <a href="#" class="menu-link text-light" onclick="toggleHeader()">
+            <i class="bi bi-chevron-bar-up"></i> Hide
+          </a>
+        </nav>
+      </div>
+    </div>
+    <div id="show-header-btn" class="text-end mb-4 d-none">
+      <a href="#" class="menu-link text-light" onclick="toggleHeader()">
+        <i class="bi bi-chevron-bar-down"></i> Show Header
+      </a>
+    </div>
+  </div>
+
+  {% for printer in printers %}
+  <div class="card mb-4 printer-panel" id="panel-{{ loop.index0 }}">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="printer-name fw-bold fs-3 text-light">{{ printer.name }}</div>
+          <div class="printer-divider mb-2 border-top border-light"></div>
+          <p class="text-light filename-label">
+            <strong>File:</strong>
+            <em class="filename-value" id="file-{{ loop.index0 }}" title="...">...</em>
+          </p>          
+        </div>
+        <div class="text-end">
+          <span class="badge rounded-pill bg-secondary mb-2 fs-5 fw-bold" id="status-{{ loop.index0 }}">Loading...</span>
+          <div class="printer-controls">
+            <button id="pause-{{ loop.index0 }}" class="btn btn-warning btn-sm" onclick="sendCommand('{{ printer.ip }}', 'PAUSE')">Pause</button>
+            <button id="resume-{{ loop.index0 }}" class="btn btn-success btn-sm" onclick="sendCommand('{{ printer.ip }}', 'RESUME')">Resume</button>
+            <button id="cancel-{{ loop.index0 }}" class="btn btn-danger btn-sm" onclick="confirmCancel('{{ printer.ip }}')">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <div class="mt-3">
+        <img id="thumb-{{ loop.index0 }}" class="img-fluid rounded mb-2 float-start me-3 thumbnail" alt="Thumbnail">
+      </div>
+      <div class="progress mb-3">
+        <div id="progress-{{ loop.index0 }}" class="progress-bar" role="progressbar" style="width: 0%">0%</div>
+      </div>
+      <p class="text-light mb-1">
+        <strong>Nozzle:</strong> <span id="nozzle-{{ loop.index0 }}">...</span> °C |
+        <strong>Bed:</strong> <span id="bed-{{ loop.index0 }}">...</span> °C
+      </p>
+      <p class="text-light mb-1"><strong>Duration:</strong> <span id="duration-{{ loop.index0 }}">00:00:00</span></p>
+      <p class="text-light mb-1"><strong>Est. Time:</strong> <span id="eta-{{ loop.index0 }}">00:00:00</span></p>
+      <p class="text-light mb-1"><strong>Material:</strong> <span id="material-{{ loop.index0 }}">...</span></p>
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-light">
+        <div class="modal-header">
+          <h5 class="modal-title" id="aboutModalLabel">About KlipDash</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            <strong>KlipDash</strong> is a real-time multi-printer dashboard built by <em>FireTail Fabrication</em>, a one-woman 3D printing business dedicated to pet safety and practical innovation.
+          </p>
+          <p>
+            This tool was designed to monitor multiple Klipper printers at a glance. It is lightweight, themeable, and fully responsive.
+          </p>
+          <p>
+            Visit the GitHub repository:<br>
+            <a href="https://github.com/zebadrabbit/klipdash" class="text-info" target="_blank">
+              <i class="bi bi-github"></i> github.com/zebadrabbit/klipdash
+            </a>
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  <script>
+    
+    function toggleHeader() {
+      const header = document.getElementById('header-bar');
+      const showBtn = document.getElementById('show-header-btn');
+
+      if (header.classList.contains('d-none')) {
+        header.classList.remove('d-none');
+        showBtn.classList.add('d-none');
+      } else {
+        header.classList.add('d-none');
+        showBtn.classList.remove('d-none');
+      }
+    }
+
+    function formatTime(seconds) {
+      const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+      const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+      const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+
+    async function fetchStatus(index, ip) {
+      try {
+        const res = await fetch(`/api/status/${ip}`);
+        const data = await res.json();
+        if (data.error) throw data.error;
+
+        const file = data.print_stats.filename || 'N/A';
+        const state = data.print_stats.state;
+        const nozzle = data.extruder.temperature.toFixed(1);
+        const bed = data.heater_bed.temperature.toFixed(1);
+        const progress = data.display_status.progress || 0;
+        const duration = data.print_stats.total_duration || 0;
+
+        const fileEl = document.getElementById(`file-${index}`);
+        fileEl.textContent = file;
+        fileEl.title = file;
+
+        document.getElementById(`nozzle-${index}`).textContent = nozzle;
+        document.getElementById(`bed-${index}`).textContent = bed;
+        document.getElementById(`duration-${index}`).textContent = formatTime(duration);
+
+        const progressBar = document.getElementById(`progress-${index}`);
+        const newPercent = (progress * 100).toFixed(0);
+        progressBar.style.width = `${newPercent}%`;
+        progressBar.textContent = `${newPercent}%`;
+
+        progressBar.className = 'progress-bar fw-bold fs-5';
+        if (state === 'complete') {
+          progressBar.classList.add('bg-success');
+        } else {
+          progressBar.classList.add('bg-success', 'progress-bar-striped', 'progress-bar-animated');
+        }
+
+        const statusEl = document.getElementById(`status-${index}`);
+        statusEl.className = 'badge rounded-pill mb-2 fs-5 fw-bold';
+        let icon = '';
+        if (state === 'printing') {
+          statusEl.classList.add('status-printing');
+          icon = '<i class="bi bi-play-fill"></i>';
+        } else if (state === 'paused') {
+          statusEl.classList.add('status-paused');
+          icon = '<i class="bi bi-pause-fill"></i>';
+        } else if (state === 'complete') {
+          statusEl.classList.add('status-complete');
+          icon = '<i class="bi bi-check-circle-fill"></i>';
+        } else {
+          statusEl.classList.add('status-offline');
+          icon = '<i class="bi bi-slash-circle-fill"></i>';
+        }
+        statusEl.innerHTML = `${icon} ${state.charAt(0).toUpperCase() + state.slice(1)}`;
+
+        const pauseBtn = document.getElementById(`pause-${index}`);
+        const resumeBtn = document.getElementById(`resume-${index}`);
+        const cancelBtn = document.getElementById(`cancel-${index}`);
+        pauseBtn.disabled = resumeBtn.disabled = cancelBtn.disabled = true;
+        if (state === 'printing') {
+          pauseBtn.disabled = false;
+          cancelBtn.disabled = false;
+        } else if (state === 'paused') {
+          resumeBtn.disabled = false;
+          cancelBtn.disabled = false;
+        }
+
+        if (file !== 'N/A') {
+          const [thumbRes, metaRes] = await Promise.all([
+            fetch(`http://${ip}/server/files/thumbnails?filename=${encodeURIComponent(file)}`),
+            fetch(`http://${ip}/server/files/metadata?filename=${encodeURIComponent(file)}`)
+          ]);
+          const thumbs = await thumbRes.json();
+          const meta = await metaRes.json();
+
+          if (Array.isArray(thumbs.result) && thumbs.result.length > 1) {
+            const imageUrl = `http://${ip}/server/files/gcodes/${thumbs.result[1].thumbnail_path}`;
+            document.getElementById(`thumb-${index}`).src = imageUrl;
+          } else {
+            document.getElementById(`thumb-${index}`).src = "{{ url_for('static', filename='placeholder.png') }}";
+          }
+
+          document.getElementById(`eta-${index}`).textContent = formatTime(meta.result.estimated_time || 0);
+          document.getElementById(`material-${index}`).textContent = meta.result.filament_type || 'N/A';
+        }
+      } catch (err) {
+        const statusEl = document.getElementById(`status-${index}`);
+        statusEl.className = 'badge status mb-2 status-offline';
+        statusEl.innerHTML = '<i class="bi bi-slash-circle-fill"></i> Offline';
+      }
+    }
+
+    function updateAll() {
+      {% for printer in printers %}
+      fetchStatus({{ loop.index0 }}, "{{ printer.ip }}");
+      {% endfor %}
+    }
+
+    function sendCommand(ip, cmd) {
+      fetch(`/api/control/${ip}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ script: cmd })
+      }).then(() => updateAll());
+    }
+
+    function confirmCancel(ip) {
+      if (confirm("Are you sure you want to cancel the print?")) {
+        sendCommand(ip, "CANCEL_PRINT");
+      }
+    }
+
+    updateAll();
+    setInterval(updateAll, 5000);
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
