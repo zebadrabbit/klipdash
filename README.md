@@ -71,6 +71,7 @@ Each printer should:
 ## 📸 Screenshots
 
 ![KlipDash Screenshot](https://github.com/user-attachments/assets/b04a0e5b-09b9-4808-b1d0-1788b7452ea9)
+![KlipDash Mobile Screenshot](https://github.com/user-attachments/assets/c5b822b8-c6a3-4d85-ac91-a062b0fbd735)
 
 ---
 
