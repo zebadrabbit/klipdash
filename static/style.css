@@ -98,6 +98,18 @@ body {
     background-color: #6c757d; /* Gray for offline */
 }
 
+.status-standby {
+    background-color: #6c757d; /* Gray for standby */
+}
+
+.status-error {
+    background-color: #dc3545; /* Red for error */
+}
+
+.status-cancelled {
+    background-color: #343a40; /* Dark gray for cancelled */
+}
+
 /* Filename label styling */
 .filename-label {
     display: flex;
