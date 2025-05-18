@@ -1,31 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Metadata and Title -->
   <meta charset="UTF-8">
   <title>KlipDash</title>
+
+  <!-- Bootstrap CSS for styling -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
   <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+
+  <!-- Favicon -->
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
+  <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body class="container py-4">
+  <!-- Header Section -->
   <div class="header mb-4">
-    <div class="d-flex justify-content-between align-items-end mb-4" id="header-bar">
-      <img src="{{ url_for('static', filename='logo_full.png') }}" alt="KlipDash Logo" class="logo">
-      <div class="text-end">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-end mb-4" id="header-bar">
+      <!-- Logo -->
+      <img src="{{ url_for('static', filename='logo_full.png') }}" alt="KlipDash Logo" class="logo mb-3 mb-md-0">
+
+      <!-- Navigation Menu -->
+      <div class="text-center text-md-end">
         <nav class="menu-links">
+          <!-- Refresh Button -->
           <a href="#" class="menu-link text-light me-3" onclick="updateAll()">
             <i class="bi bi-arrow-clockwise"></i> Refresh
           </a>
+          <!-- About Modal Trigger -->
           <a href="#" class="menu-link text-light me-3" data-bs-toggle="modal" data-bs-target="#aboutModal">
             <i class="bi bi-info-circle"></i> About
           </a>
+          <!-- Toggle Header Visibility -->
           <a href="#" class="menu-link text-light" onclick="toggleHeader()">
             <i class="bi bi-chevron-bar-up"></i> Hide
           </a>
         </nav>
       </div>
     </div>
+
+    <!-- Show Header Button (Hidden by Default) -->
     <div id="show-header-btn" class="text-end mb-4 d-none">
       <a href="#" class="menu-link text-light" onclick="toggleHeader()">
         <i class="bi bi-chevron-bar-down"></i> Show Header
@@ -33,44 +51,67 @@
     </div>
   </div>
 
+  <!-- Printer Panels -->
   {% for printer in printers %}
   <div class="card mb-4 printer-panel" id="panel-{{ loop.index0 }}">
     <div class="card-body">
-      <div class="d-flex justify-content-between align-items-start">
-        <div>
-          <div class="printer-name fw-bold fs-3 text-light">{{ printer.name }}</div>
-          <div class="printer-divider mb-2 border-top border-light"></div>
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start">
+        <!-- Printer Information -->
+        <div class="mb-1 mb-md-0">
+          <div class="d-flex align-items-end">
+            <div class="printer-name fw-bold fs-5 text-light me-3">{{ printer.name }}</div>
+            <div class="printer-ip fw-bold text-muted pb-1">({{ printer.ip }})</div>
+          </div>
+          
+          <div class="printer-divider mb-1 border-top border-light"></div>
           <p class="text-light filename-label">
             <strong>File:</strong>
             <em class="filename-value" id="file-{{ loop.index0 }}" title="...">...</em>
-          </p>          
+          </p>
         </div>
-        <div class="text-end">
-          <span class="badge rounded-pill bg-secondary mb-2 fs-5 fw-bold" id="status-{{ loop.index0 }}">Loading...</span>
+
+        <!-- Printer Controls -->
+        <div class="text-center text-md-end">
+          <span class="badge rounded-pill bg-secondary mb-2 fs-6 fw-bold" id="status-{{ loop.index0 }}">Loading...</span>
           <div class="printer-controls">
-            <button id="pause-{{ loop.index0 }}" class="btn btn-warning btn-sm" onclick="sendCommand('{{ printer.ip }}', 'PAUSE')">Pause</button>
-            <button id="resume-{{ loop.index0 }}" class="btn btn-success btn-sm" onclick="sendCommand('{{ printer.ip }}', 'RESUME')">Resume</button>
-            <button id="cancel-{{ loop.index0 }}" class="btn btn-danger btn-sm" onclick="confirmCancel('{{ printer.ip }}')">Cancel</button>
+            <!-- Pause Button -->
+            <button id="pause-{{ loop.index0 }}" class="btn btn-warning btn-sm mb-2" onclick="sendCommand('{{ printer.ip }}', 'PAUSE')">Pause</button>
+            <!-- Resume Button -->
+            <button id="resume-{{ loop.index0 }}" class="btn btn-success btn-sm mb-2" onclick="sendCommand('{{ printer.ip }}', 'RESUME')">Resume</button>
+            <!-- Cancel Button -->
+            <button id="cancel-{{ loop.index0 }}" class="btn btn-danger btn-sm mb-2" onclick="confirmCancel('{{ printer.ip }}')">Cancel</button>
           </div>
         </div>
       </div>
-      <div class="mt-3">
-        <img id="thumb-{{ loop.index0 }}" class="img-fluid rounded mb-2 float-start me-3 thumbnail" alt="Thumbnail">
+
+      <!-- Printer Thumbnail and Status -->
+      <div class="d-flex flex-column flex-md-row align-items-start">
+        <!-- Printer Thumbnail -->
+        <div class="thumbnail-container me-md-3 mb-3 mb-md-0">
+          <img id="thumb-{{ loop.index0 }}" class="img-fluid rounded thumbnail" alt="Thumbnail">
+        </div>
+
+        <!-- Printer Status and Progress -->
+        <div class="status-progress-container flex-grow-1">
+          <!-- Progress Bar -->
+          <div class="progress mb-3">
+            <div id="progress-{{ loop.index0 }}" class="progress-bar" role="progressbar" style="width: 0%">0%</div>
+          </div>
+
+          <!-- Printer Details -->
+          <p class="text-light mb-1">
+            <strong>Nozzle:</strong> <span id="nozzle-{{ loop.index0 }}">...</span> °C |
+            <strong>Bed:</strong> <span id="bed-{{ loop.index0 }}">...</span> °C
+          </p>
+          <p class="text-light mb-1"><strong>Duration:</strong> <span id="duration-{{ loop.index0 }}">00:00:00</span></p>
+          <p class="text-light mb-1"><strong>Est. Time:</strong> <span id="eta-{{ loop.index0 }}">00:00:00</span></p>
+        </div>
       </div>
-      <div class="progress mb-3">
-        <div id="progress-{{ loop.index0 }}" class="progress-bar" role="progressbar" style="width: 0%">0%</div>
-      </div>
-      <p class="text-light mb-1">
-        <strong>Nozzle:</strong> <span id="nozzle-{{ loop.index0 }}">...</span> °C |
-        <strong>Bed:</strong> <span id="bed-{{ loop.index0 }}">...</span> °C
-      </p>
-      <p class="text-light mb-1"><strong>Duration:</strong> <span id="duration-{{ loop.index0 }}">00:00:00</span></p>
-      <p class="text-light mb-1"><strong>Est. Time:</strong> <span id="eta-{{ loop.index0 }}">00:00:00</span></p>
-      <p class="text-light mb-1"><strong>Material:</strong> <span id="material-{{ loop.index0 }}">...</span></p>
     </div>
   </div>
   {% endfor %}
 
+  <!-- About Modal -->
   <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content bg-dark text-light">
@@ -98,10 +139,10 @@
       </div>
     </div>
   </div>
-  
 
+  <!-- JavaScript Section -->
   <script>
-    
+    // Toggles the visibility of the header
     function toggleHeader() {
       const header = document.getElementById('header-bar');
       const showBtn = document.getElementById('show-header-btn');
@@ -115,6 +156,7 @@
       }
     }
 
+    // Formats time in HH:MM:SS
     function formatTime(seconds) {
       const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
       const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
@@ -122,6 +164,7 @@
       return `${h}:${m}:${s}`;
     }
 
+    // Fetches and updates printer status
     async function fetchStatus(index, ip) {
       try {
         const res = await fetch(`/api/status/${ip}`);
@@ -129,6 +172,19 @@
         if (data.error) throw data.error;
 
         const file = data.print_stats.filename || 'N/A';
+
+        // Fetch the thumbnail list for this file
+        let thumbnailPath = null;
+        if (file && file !== 'N/A') {
+          // Use the proxy to get the thumbnail list
+          const thumbsRes = await fetch(`/proxy/thumbnails/${ip}?filename=${encodeURIComponent(file)}`);
+          const thumbsData = await thumbsRes.json();
+          if (thumbsData.result && thumbsData.result.length > 0) {
+            // Pick the largest thumbnail (usually the last one)
+            thumbnailPath = thumbsData.result[thumbsData.result.length - 1].thumbnail_path;
+          }
+        }
+
         const state = data.print_stats.state;
         const nozzle = data.extruder.temperature.toFixed(1);
         const bed = data.heater_bed.temperature.toFixed(1);
@@ -185,37 +241,29 @@
           cancelBtn.disabled = false;
         }
 
-        if (file !== 'N/A') {
-          const [thumbRes, metaRes] = await Promise.all([
-            fetch(`http://${ip}/server/files/thumbnails?filename=${encodeURIComponent(file)}`),
-            fetch(`http://${ip}/server/files/metadata?filename=${encodeURIComponent(file)}`)
-          ]);
-          const thumbs = await thumbRes.json();
-          const meta = await metaRes.json();
-
-          if (Array.isArray(thumbs.result) && thumbs.result.length > 1) {
-            const imageUrl = `http://${ip}/server/files/gcodes/${thumbs.result[1].thumbnail_path}`;
-            document.getElementById(`thumb-${index}`).src = imageUrl;
-          } else {
-            document.getElementById(`thumb-${index}`).src = "{{ url_for('static', filename='placeholder.png') }}";
-          }
-
-          document.getElementById(`eta-${index}`).textContent = formatTime(meta.result.estimated_time || 0);
-          document.getElementById(`material-${index}`).textContent = meta.result.filament_type || 'N/A';
+        // Only update the thumbnail if we have a path and it's time to update
+        const lastUpdate = data.print_stats.last_update || 0;
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (thumbnailPath && (currentTime - lastUpdate > 10)) {
+          updateThumbnail(index, ip, thumbnailPath);
+          console.log(`Updated thumbnail for printer ${index} (${ip})`);
         }
-      } catch (err) {
+
+        } catch (err) {
         const statusEl = document.getElementById(`status-${index}`);
         statusEl.className = 'badge status mb-2 status-offline';
         statusEl.innerHTML = '<i class="bi bi-slash-circle-fill"></i> Offline';
       }
     }
 
+    // Updates all printers' statuses
     function updateAll() {
       {% for printer in printers %}
       fetchStatus({{ loop.index0 }}, "{{ printer.ip }}");
       {% endfor %}
     }
 
+    // Sends a command to the printer
     function sendCommand(ip, cmd) {
       fetch(`/api/control/${ip}`, {
         method: 'POST',
@@ -224,16 +272,64 @@
       }).then(() => updateAll());
     }
 
+    // Confirms and cancels a print
     function confirmCancel(ip) {
       if (confirm("Are you sure you want to cancel the print?")) {
         sendCommand(ip, "CANCEL_PRINT");
       }
     }
 
+    // Track the current image type for each printer
+    const thumbnailState = {};
+
+    async function updateThumbnail(index, ip, thumbnailPath) {
+        try {
+            const thumbnail = document.getElementById(`thumb-${index}`);
+
+            if (!thumbnailState[index]) {
+                thumbnailState[index] = 'snapshot';
+            }
+
+            let newSrc;
+            if (thumbnailState[index] === 'snapshot') {
+                const snapshotUrl = `/proxy/snapshot/${ip}`;
+                const response = await fetch(snapshotUrl, { method: 'GET' });
+
+                if (response.ok) {
+                    newSrc = snapshotUrl;
+                } else {
+                    newSrc = `/proxy/thumbnail/${ip}?thumbnail_path=${encodeURIComponent(thumbnailPath)}`;
+                }
+                thumbnailState[index] = 'gcode';
+            } else {
+                newSrc = `/proxy/thumbnail/${ip}?thumbnail_path=${encodeURIComponent(thumbnailPath)}`;
+                thumbnailState[index] = 'snapshot';
+            }
+
+            if (thumbnail.src !== newSrc) {
+                // Fade out
+                thumbnail.classList.add('fading');
+                // Wait for fade-out to finish before changing src
+                setTimeout(() => {
+                    thumbnail.src = newSrc;
+                }, 350); // half the transition duration
+
+                thumbnail.onload = () => {
+                    // Fade in
+                    thumbnail.classList.remove('fading');
+                };
+            }
+        } catch (error) {
+            console.error('Error updating thumbnail:', error);
+        }
+    }
+
+    // Initial update and periodic refresh
     updateAll();
     setInterval(updateAll, 5000);
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
