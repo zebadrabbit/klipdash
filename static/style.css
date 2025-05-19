@@ -110,27 +110,6 @@ body {
     background-color: #343a40; /* Dark gray for cancelled */
 }
 
-/* Filename label styling */
-.filename-label {
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-    gap: 0.5em;
-    font-size: 1.1rem;
-    overflow: hidden;
-}
-
-/* Filename value styling */
-.filename-value {
-    font-size: 1.1rem;
-    font-style: italic;
-    display: inline-block;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis; /* Adds "..." for truncated text */
-    white-space: nowrap;
-    vertical-align: bottom;
-}
 
 /* Logo styling */
 .logo {
@@ -156,13 +135,13 @@ body {
 }
 
 /* Printer name and IP styling */
-.printer-name,
-.printer-ip {
+.printer-name {
+    font-size: 2.5rem;
     line-height: 1.2;
 }
 
 .printer-ip {
-    font-size: 0.95rem;
+    font-size: 1rem;
     opacity: 0.75;
 }
 
@@ -228,7 +207,7 @@ body {
 
 @media (max-width: 991.98px) {
     .d-flex.flex-column.flex-md-row.justify-content-between.align-items-start {
-        flex-direction: column !important;
+        /*flex-direction: column !important;*/
         align-items: stretch !important;
     }
     .text-md-end {

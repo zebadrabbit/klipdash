@@ -55,19 +55,11 @@
   {% for printer in printers %}
   <div class="card mb-4 printer-panel" id="panel-{{ loop.index0 }}">
     <div class="card-body">
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start">
+      <div class="d-flex  flex-md-row justify-content-between align-items-start">
         <!-- Printer Information -->
         <div class="mb-1 mb-md-0">
-          <div class="d-flex align-items-end">
-            <div class="printer-name fw-bold fs-5 text-light me-3">{{ printer.name }}</div>
-            <div class="printer-ip fw-bold text-muted pb-1">({{ printer.ip }})</div>
-          </div>
-          
-          <div class="printer-divider mb-1 border-top border-light"></div>
-          <p class="text-light filename-label">
-            <strong>File:</strong>
-            <em class="filename-value" id="file-{{ loop.index0 }}" title="...">...</em>
-          </p>
+            <div class="printer-name fw-bold text-light me-3">{{ printer.name }}</div>
+            <div class="printer-ip fw-bold text-muted">{{ printer.ip }}</div>
         </div>
 
         <!-- Printer Controls -->
@@ -76,7 +68,7 @@
           <div class="printer-controls">
             <!-- Emergency Stop Button -->
             <button id="emergency-{{ loop.index0 }}" class="btn btn-danger btn-sm mb-2" style="font-weight:bold;" onclick="sendCommand('{{ printer.ip }}', 'EMERGENCY_STOP')">
-              <i class="bi bi-exclamation-octagon-fill"></i> E-Stop
+              <i class="bi bi-exclamation-octagon-fill"></i>
             </button>
             <!-- Pause Button -->
             <button id="pause-{{ loop.index0 }}" class="btn btn-warning btn-sm mb-2 ms-3" onclick="sendCommand('{{ printer.ip }}', 'PAUSE')">Pause</button>
@@ -103,6 +95,11 @@
           </div>
 
           <!-- Printer Details -->
+          <p class="text-light filename-label">
+            <strong>File:</strong>
+            <em class="filename-value" id="file-{{ loop.index0 }}" title="...">...</em>
+          </p>
+               
           <p class="text-light mb-1">
             <strong>Nozzle:</strong> <span id="nozzle-{{ loop.index0 }}">...</span> °C |
             <strong>Bed:</strong> <span id="bed-{{ loop.index0 }}">...</span> °C

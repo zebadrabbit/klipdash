@@ -3,8 +3,14 @@ const previousStates = {};
 
 // Request notification permission on page load
 document.addEventListener('DOMContentLoaded', function() {
-    if ('Notification' in window && Notification.permission !== 'granted') {
-    Notification.requestPermission();
+    if ('Notification' in window) {
+        if (Notification.permission === 'default') {
+            // Ask the user if they want to enable notifications
+            const ask = confirm('Would you like to enable browser notifications for print status updates?');
+            if (ask) {
+                Notification.requestPermission();
+            }
+        }
     }
 });
 
@@ -17,6 +23,30 @@ function notifyPrintComplete(printerName, file) {
         icon: '/static/logo.png'
     };
     new Notification(title, options);
+    }
+}
+
+// Show browser notification for paused print
+function notifyPrintPaused(printerName, file) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        const title = `Print Paused: ${printerName}`;
+        const options = {
+            body: file ? `File: ${file}` : '',
+            icon: '/static/logo.png'
+        };
+        new Notification(title, options);
+    }
+}
+
+// Show browser notification for error print
+function notifyPrintError(printerName, file) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        const title = `Print Error: ${printerName}`;
+        const options = {
+            body: file ? `File: ${file}` : '',
+            icon: '/static/logo.png'
+        };
+        new Notification(title, options);
     }
 }
 
@@ -65,9 +95,15 @@ async function fetchStatus(index, ip) {
     }
 
     const state = data.print_stats.state;
-    // Notify if print just completed
+    // Notify if print just completed, paused, or errored
     if (previousStates[ip] !== 'complete' && state === 'complete') {
         notifyPrintComplete(printerName, file);
+    }
+    if (previousStates[ip] !== 'paused' && state === 'paused') {
+        notifyPrintPaused(printerName, file);
+    }
+    if (previousStates[ip] !== 'error' && state === 'error') {
+        notifyPrintError(printerName, file);
     }
     previousStates[ip] = state;
 
@@ -99,71 +135,86 @@ async function fetchStatus(index, ip) {
     const statusEl = document.getElementById(`status-${index}`);
     statusEl.className = 'badge rounded-pill mb-2 fs-5 fw-bold';
     let icon = '';
-    if (state === 'printing') {
+    let statusText = state.charAt(0).toUpperCase() + state.slice(1);
+    switch (state) {
+      case 'printing':
         statusEl.classList.add('status-printing');
         icon = '<i class="bi bi-play-fill"></i>';
-    } else if (state === 'paused') {
+        break;
+      case 'paused':
         statusEl.classList.add('status-paused');
         icon = '<i class="bi bi-pause-fill"></i>';
-    } else if (state === 'complete') {
+        break;
+      case 'standby':
+        statusEl.classList.add('status-standby');
+        icon = '<i class="bi bi-hourglass"></i>';
+        break;
+      case 'complete':
         statusEl.classList.add('status-complete');
         icon = '<i class="bi bi-check-circle-fill"></i>';
-    } else {
+        break;
+      case 'error':
+        statusEl.classList.add('status-error');
+        icon = '<i class="bi bi-x-circle-fill"></i>';
+        statusText = 'Error';
+        break;
+      case 'cancelled':
+        statusEl.classList.add('status-cancelled');
+        icon = '<i class="bi bi-slash-circle-fill"></i>';
+        statusText = 'E-Stop';
+        break;
+      default:
         statusEl.classList.add('status-offline');
         icon = '<i class="bi bi-slash-circle-fill"></i>';
+        break;
     }
-    statusEl.innerHTML = `${icon} ${state.charAt(0).toUpperCase() + state.slice(1)}`;
-
+    statusEl.innerHTML = `${icon} ${statusText}`;
     
     const pauseBtn = document.getElementById(`pause-${index}`);
     const resumeBtn = document.getElementById(`resume-${index}`);
     const cancelBtn = document.getElementById(`cancel-${index}`);
     const emergencyBtn = document.getElementById(`emergency-${index}`);
-    pauseBtn.disabled = resumeBtn.disabled = cancelBtn.disabled = emergencyBtn.disabled = true;
+    pauseBtn.disabled = resumeBtn.disabled = cancelBtn.disabled = true;
+    emergencyBtn.disabled = false;
 
     // Button and status logic for all states
     switch (state) {
       case 'printing':
         pauseBtn.disabled = false;
         cancelBtn.disabled = false;
-        emergencyBtn.disabled = false;
         statusEl.classList.add('status-printing');
         icon = '<i class="bi bi-play-fill"></i>';
         break;
       case 'paused':
         resumeBtn.disabled = false;
         cancelBtn.disabled = false;
-        emergencyBtn.disabled = false;
         statusEl.classList.add('status-paused');
         icon = '<i class="bi bi-pause-fill"></i>';
         break;
       case 'standby':
-        emergencyBtn.disabled = false;
         statusEl.classList.add('status-standby');
         icon = '<i class="bi bi-hourglass"></i>';
         break;
       case 'complete':
-        emergencyBtn.disabled = false;
         statusEl.classList.add('status-complete');
         icon = '<i class="bi bi-check-circle-fill"></i>';
         break;
       case 'error':
-        emergencyBtn.disabled = false;
         statusEl.classList.add('status-error');
         icon = '<i class="bi bi-x-circle-fill"></i>';
+        statusText = 'Error';
         break;
       case 'cancelled':
-        emergencyBtn.disabled = false;
         statusEl.classList.add('status-cancelled');
         icon = '<i class="bi bi-slash-circle-fill"></i>';
+        statusText = 'E-Stop';
         break;
       default:
-        emergencyBtn.disabled = false;
         statusEl.classList.add('status-offline');
         icon = '<i class="bi bi-slash-circle-fill"></i>';
         break;
     }
-    statusEl.innerHTML = `${icon} ${state.charAt(0).toUpperCase() + state.slice(1)}`;
+    statusEl.innerHTML = `${icon} ${statusText}`;
 
     // Only update the thumbnail if we have a path and it's time to update
     const lastUpdate = data.print_stats.last_update || 0;
